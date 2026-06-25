@@ -32,6 +32,10 @@ export async function POST(request: Request) {
   const body: ProjectInsert = await request.json();
   const { name, client_name, description, status, priority, start_date, due_date } = body;
 
+  if (due_date && start_date && due_date < start_date) {
+    return NextResponse.json({ error: "Due date cannot be earlier than start date" }, { status: 422 });
+  }
+
   const { data, error } = await supabase
     .from("projects")
     .insert({ name, client_name, description, status, priority, start_date, due_date })
