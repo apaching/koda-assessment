@@ -13,6 +13,10 @@ Built with Next.js, Supabase, TanStack Query, and Tailwind CSS.
 | **Tailwind CSS 4**  |                                                                                                                                                  |
 | **TypeScript**      | Type safety                                                                                                                                      |
 
+## Live Demo
+
+A deployed version is available at [https://koda-assessment.vercel.app](https://koda-assessment.vercel.app/auth/signin) if you'd like to try it out without setting up locally.
+
 ## Getting Started
 
 ### Prerequisites
