@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 import type { Project, ProjectStatus, ProjectPriority } from "@/types/types";
 import FilterSelect from "@/components/ui/FilterSelect";
 import { useProjects } from "@/hooks/projects/useProjects";
@@ -23,6 +24,13 @@ export default function ProjectList() {
   // Filters
   const [status, setStatus] = useState<ProjectStatus | "">("");
   const [priority, setPriority] = useState<ProjectPriority | "">("");
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    await fetch("/api/auth/signout", { method: "POST" });
+    window.location.href = "/auth/signin";
+  }
 
   // Data + mutations
   const { data: projects, isPending, isError } = useProjects({
@@ -94,6 +102,14 @@ export default function ProjectList() {
               { value: "HIGH", label: "High" },
             ]}
           />
+          <button
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+            className="ml-2 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:inline">Sign Out</span>
+          </button>
         </div>
       </header>
 
