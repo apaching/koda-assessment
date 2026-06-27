@@ -2,33 +2,25 @@
 
 ```
 src/
-├── app/                        # Next.js App Router
-│   ├── api/                    # Route Handlers (HTTP endpoints)
-│   │   └── [resource]/
-│   │       └── route.ts
-│   ├── (routes)/               # Page segments
-│   │   └── [page]/
-│   │       ├── page.tsx
-│   │       └── layout.tsx
+├── app/
+│   ├── api/[resource]/route.ts    # Route Handlers
+│   ├── (routes)/[page]/
+│   │   ├── page.tsx
+│   │   └── layout.tsx
 │   ├── globals.css
 │   └── layout.tsx
 │
-├── components/                 # Reusable UI components
-│   └── [feature]/              # Grouped by feature or domain
-│       └── ComponentName.tsx
+├── components/[feature]/          # UI components grouped by feature
 │
-├── hooks/                      # Custom hooks (TanStack Query wrappers)
-│   └── [feature]/
-│       ├── useResource.ts      # read
-│       └── useCreateResource.ts # mutation
+├── hooks/[feature]/               # TanStack Query wrappers
+│   ├── useResource.ts             # query
+│   └── useCreateResource.ts       # mutation
 │
-├── lib/                        # Shared utilities and config
-│   └── utils.ts
+├── lib/utils.ts
 │
-└── utils/
-    └── supabase/
-        ├── client.ts           # Browser Supabase client
-        └── server.ts           # Server Supabase client
+└── utils/supabase/
+    ├── client.ts                  # Browser client
+    └── server.ts                  # Server client
 ```
 
 ## Rules
@@ -36,4 +28,4 @@ src/
 - `app/api/` — HTTP only. No React, no hooks.
 - `components/` — UI only. No direct `fetch` calls.
 - `hooks/` — One file per query/mutation. Named `use<Resource>` or `use<Verb><Resource>`.
-- Keep feature-related files together within their folder (don't scatter by type alone).
+- Group related files by feature, not by type.

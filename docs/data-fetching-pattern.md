@@ -1,21 +1,18 @@
 # Data Fetching Pattern
 
-**Stack:** TanStack Query (React Query) + `fetch` + Next.js Route Handlers.
+TanStack Query + `fetch` + Next.js Route Handlers.
 
-**Flow:** `Component → Custom Hook → TanStack Query → fetch → API Route → Supabase`
+`Component → Hook → TanStack Query → fetch → API Route → Supabase`
 
 ---
 
-## Layer 1: API Route (`src/app/api/*/route.ts`)
+## API Route (`src/app/api/*/route.ts`)
 
-**Responsibility:** HTTP boundary. Parse the request, query the database, return JSON.
+Handles HTTP. Parses request, queries Supabase, returns JSON.
 
-- Owns authentication and authorization checks (via Supabase server client)
-- Validates/destructures the request body — no raw passthrough to DB
-- Returns `{ data }` on success, `{ error }` with an appropriate status code on failure
-- Contains no business logic that belongs in the UI layer
-
-**Does not:** import React, reference TanStack Query, or know anything about cache state.
+- Auth checks via Supabase server client
+- Returns `{ data }` on success, `{ error }` + status code on failure
+- No React, no TanStack Query
 
 ```ts
 // src/app/api/brands/route.ts
@@ -37,19 +34,16 @@ export async function POST(request: Request) {
 
 ---
 
-## Layer 2: Custom Hook (`src/hooks/*/use*.ts`)
+## Hook (`src/hooks/*/use*.ts`)
 
-**Responsibility:** Encapsulates one TanStack Query call — query or mutation — plus its cache management.
+Wraps one TanStack Query call (query or mutation) with cache management.
 
-- Holds the `queryKey`, cache invalidation, and optimistic update logic
-- Throws on non-ok responses so TanStack Query can catch and surface errors
-- Casts the response to the correct TypeScript type
-- Marked `"use client"` — only consumed in Client Components
-
-**Does not:** render anything, hold UI state, or contain conditional fetching logic beyond `enabled`.
+- Holds `queryKey`, invalidation, and optimistic update logic
+- Throws on non-ok responses
+- Marked `"use client"`
 
 ```ts
-// src/hooks/brands/useBrands.ts — read
+// src/hooks/brands/useBrands.ts
 "use client";
 export function useBrands(userId: string) {
   return useQuery({
@@ -64,7 +58,7 @@ export function useBrands(userId: string) {
   });
 }
 
-// src/hooks/brands/useCreateBrand.ts — mutation with optimistic update
+// src/hooks/brands/useCreateBrand.ts
 "use client";
 export function useCreateBrand() {
   const queryClient = useQueryClient();
@@ -101,15 +95,11 @@ export function useCreateBrand() {
 
 ---
 
-## Layer 3: Component (`src/components/*` or `src/app/**/page.tsx`)
+## Component (`src/components/*` or `src/app/**/page.tsx`)
 
-**Responsibility:** Consume the hook, render loading/error/data states, dispatch mutations.
+Uses the hook, renders loading/error/data states, calls mutations.
 
-- Destructures `{ data, isPending, isError, mutate }` — no raw `fetch` calls
-- Passes typed arguments directly to `mutate()`
-- Owns UX decisions: what to show during loading, how to display errors
-
-**Does not:** manage query keys, know the API URL, or contain cache logic.
+- No raw `fetch` calls, no query keys, no cache logic
 
 ```tsx
 // src/components/brands/BrandList.tsx
@@ -137,13 +127,12 @@ export function BrandList({ userId }: { userId: string }) {
 
 ---
 
-## Rules at a Glance
+## Quick Reference
 
-| Concern | Lives in |
+| Concern | Where |
 |---|---|
-| HTTP method, URL, headers | Custom hook's `mutationFn` / `queryFn` |
 | Auth, DB queries | API route |
-| Cache keys, invalidation, optimistic updates | Custom hook |
+| HTTP method, URL, headers | Hook (`queryFn` / `mutationFn`) |
+| Cache keys, invalidation, optimistic updates | Hook |
 | Loading / error UI | Component |
-| Type casting the response | Custom hook |
-| Business logic (e.g. slug generation) | Component or a pure utility, passed into `mutate()` |
+| Business logic (e.g. slug generation) | Component or utility, passed into `mutate()` |
