@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createClient } from "../../../../utils/supabase/server";
 import type { ProjectUpdate } from "../../../../types/types";
 
@@ -8,13 +7,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
+
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { data, error } = await supabase
     .from("projects")
     .select("*")
     .eq("id", id)
+    .eq("user_id", userId)
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 404 });
@@ -26,8 +29,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
+
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const body: ProjectUpdate = await request.json();
   const { name, client_name, description, status, priority, start_date, due_date } = body;
 
@@ -39,6 +46,7 @@ export async function PUT(
     .from("projects")
     .update({ name, client_name, description, status, priority, start_date, due_date, updated_at: new Date().toISOString() })
     .eq("id", id)
+    .eq("user_id", userId)
     .select()
     .single();
 
@@ -51,10 +59,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
-  const { error } = await supabase.from("projects").delete().eq("id", id);
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ data: null });

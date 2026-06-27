@@ -7,7 +7,7 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (body: ProjectInsert) => {
+    mutationFn: async (body: Omit<ProjectInsert, "user_id">) => {
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

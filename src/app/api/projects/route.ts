@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createClient } from "../../../utils/supabase/server";
 import type { ProjectInsert, ProjectStatus, ProjectPriority } from "../../../types/types";
 
 export async function GET(request: Request) {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
+
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const { searchParams } = new URL(request.url);
 
   const status = searchParams.get("status") as ProjectStatus | null;
@@ -13,7 +16,11 @@ export async function GET(request: Request) {
   const client_name = searchParams.get("client_name");
   const search = searchParams.get("search");
 
-  let query = supabase.from("projects").select("*").order("created_at", { ascending: false });
+  let query = supabase
+    .from("projects")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
   if (status) query = query.eq("status", status);
   if (priority) query = query.eq("priority", priority);
@@ -27,9 +34,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const body: ProjectInsert = await request.json();
+  const supabase = await createClient();
+
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body: Omit<ProjectInsert, "user_id"> = await request.json();
   const { name, client_name, description, status, priority, start_date, due_date } = body;
 
   if (due_date && start_date && due_date < start_date) {
@@ -38,7 +49,7 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabase
     .from("projects")
-    .insert({ name, client_name, description, status, priority, start_date, due_date })
+    .insert({ name, client_name, description, status, priority, start_date, due_date, user_id: userId })
     .select()
     .single();
 

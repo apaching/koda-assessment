@@ -1,9 +1,12 @@
 import { Enums, Tables, TablesInsert, TablesUpdate } from "./supabase";
 
 // Row types
+export type User = Tables<"users">;
 export type Project = Tables<"projects">;
 
 // Insert / Update types
+export type UserInsert = TablesInsert<"users">;
+export type UserUpdate = TablesUpdate<"users">;
 export type ProjectInsert = TablesInsert<"projects">;
 export type ProjectUpdate = TablesUpdate<"projects">;
 

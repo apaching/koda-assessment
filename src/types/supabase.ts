@@ -26,6 +26,7 @@ export type Database = {
           start_date: string | null
           status: Database["public"]["Enums"]["project_status"]
           updated_at: string
+          user_id: string
         }
         Insert: {
           client_name: string
@@ -38,6 +39,7 @@ export type Database = {
           start_date?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           updated_at?: string
+          user_id: string
         }
         Update: {
           client_name?: string
@@ -50,6 +52,31 @@ export type Database = {
           start_date?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          last_name: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          last_name?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          last_name?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
