@@ -78,10 +78,6 @@ I would improve on the UI. The UI looks okay but it looks generic as it's been m
 
 I would also improve on the functionality, as currently it's very bare–it doesn't have sorting, search. I don't have experience doing this yet, but a feature I can think of that can make this project's UX better is a drag and drop system similar to something like GitHub projects–so the projects will be separated by columns, and when you want to change the progress of a project, an option on how to do it would be dragging.
 
-### What was the most challenging part of this assessment?
-
-<!-- Your answer here -->
-
 ### Did you use AI tools during development?
 
 Yes.
