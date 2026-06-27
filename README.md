@@ -98,4 +98,4 @@ I first created documents that the AI can reference when it's generating code. T
 
 The UI is AI generated, loosely based on another project I have (like the auth screens).
 
-AI also performs better when there's already a pattern/reference set. So what I do is I write the first few routes, hooks, etc. so that I'll have the full control over those, and I can write them how I like them, then once I've written enough, those can be used as reference also if I need to create more using AI.
+AI also performs better when there's already a pattern/reference set. So what I do is I write the the routes, hooks, etc. Then those can be used as reference also if I need to create more using AI.
